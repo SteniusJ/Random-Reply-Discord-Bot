@@ -1,0 +1,10 @@
+{
+    "name": "discord-bot-gregbot",
+    "version": "0.0.1",
+    "description": "Brainrot discord bot",
+    "dependencies": {
+        "discord.js": "^14.16.3",
+        "express": "^4.21.1",
+        "mysql2": "^3.11.3"
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "comment": "This is an example of how your config.json should look like",
+    "token": "Discord bot token",
+    "dbhost": "Database host",
+    "dbport": "Database port",
+    "dbuser": "Database user",
+    "dbpassword": "Database password",
+    "guildid": "Id of discord server",
+    "clientid": "Id of your bot",
+    "defaultdb": "Name of default DB"
+}
