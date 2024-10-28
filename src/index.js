@@ -8,8 +8,11 @@ const mysql = require('mysql2');
 
 var replies = [];
 var reactions = [];
+
+//Chance is calculated like dice, so replyChance = 12, means that there is a 1 in 12 chance for the bot to reply.
 const replyChance = 12;
 const reactChance = 6;
+
 const port = 3000;
 
 /**
