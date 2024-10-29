@@ -105,11 +105,11 @@ process.on('unhandledRejection', error => {
  */
 client.on("messageCreate", (message) => {
     //reply to random messages with a random reply from DB
-    if (Math.floor(Math.random() * replyChance) == 1 && message.author.id !== "1300070992764338226") {
+    if (Math.floor(Math.random() * replyChance) == 1 && !message.author.bot) {
         message.reply(getRandReply());
     };
     //react to random messages with a random reaction from DB
-    if (Math.floor(Math.random() * reactChance) == 1 && message.author.id !== "1300070992764338226") {
+    if (Math.floor(Math.random() * reactChance) == 1 && !message.author.bot) {
         message.react(getRandReaction());
     };
 })
