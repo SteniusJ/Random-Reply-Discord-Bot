@@ -242,10 +242,13 @@ client.on('interactionCreate', (interaction) => {
                         element.reply_message +
                         '\n -------------------------- \n';
                 });
-                if (replAr.length < 1) { replAr.push(repl) };
+                if (repl !== replAr[replAr.length - 1]) {
+                    replAr.push(repl);
+                }
                 const channelId = interaction.channel;
+                interaction.reply('All replies currently in DB: \n');
                 replAr.forEach(element => {
-                    channelId.send('All replies currently in DB: \n' + element)
+                    channelId.send(element);
                 });
             } catch (error) {
                 console.error(error);
@@ -282,10 +285,13 @@ client.on('interactionCreate', (interaction) => {
                         element.reply_message +
                         '\n -------------------------- \n';
                 });
-                if (replAr.length < 1) { replAr.push(repl) };
+                if (repl !== replAr[replAr.length - 1]) {
+                    replAr.push(repl);
+                }
                 const channelId = interaction.channel;
+                interaction.reply('All replies currently in DB: \n');
                 replAr.forEach(element => {
-                    channelId.send('All replies currently in DB: \n' + element)
+                    channelId.send(element);
                 });
             } catch (error) {
                 console.error(error);
