@@ -7,6 +7,7 @@ const config = require('../config.json');
 const mysql = require('mysql2');
 const fs = require('node:fs');
 const { stringify } = require('querystring');
+const { channel } = require('diagnostics_channel');
 
 var replies = [];
 var reactions = [];
@@ -227,8 +228,13 @@ client.on('interactionCreate', (interaction) => {
                 if (err) throw err;
 
                 //Generates reply string
+                var replAr = [];
                 var repl = '';
                 result.forEach((element) => {
+                    if (repl.length > 1800) {
+                        replAr.push(repl);
+                        repl = '';
+                    }
                     repl +=
                         'id: ' +
                         element.id +
@@ -236,7 +242,11 @@ client.on('interactionCreate', (interaction) => {
                         element.reply_message +
                         '\n -------------------------- \n';
                 });
-                interaction.reply('All replies currently in DB: \n' + repl);
+                if (replAr.length < 1) { replAr.push(repl) };
+                const channelId = interaction.channel;
+                replAr.forEach(element => {
+                    channelId.send('All replies currently in DB: \n' + element)
+                });
             } catch (error) {
                 console.error(error);
                 interaction.reply('ERROR: Failed to get list of replies');
@@ -258,16 +268,25 @@ client.on('interactionCreate', (interaction) => {
                 if (err) throw err;
 
                 //Generates reply string
+                var replAr = [];
                 var repl = '';
                 result.forEach((element) => {
+                    if (repl.length > 1800) {
+                        replAr.push(repl);
+                        repl = '';
+                    }
                     repl +=
                         'id: ' +
                         element.id +
-                        '\n Reaction: ' +
-                        element.react_emoji +
+                        '\n Message: ' +
+                        element.reply_message +
                         '\n -------------------------- \n';
                 });
-                interaction.reply('All reactions currently in DB: \n' + repl);
+                if (replAr.length < 1) { replAr.push(repl) };
+                const channelId = interaction.channel;
+                replAr.forEach(element => {
+                    channelId.send('All replies currently in DB: \n' + element)
+                });
             } catch (error) {
                 console.error(error);
                 interaction.reply('ERROR: Failed to get list of reactions');
