@@ -46,7 +46,7 @@ con.connect(function (err) {
 });
 
 /**
- * Reply and reaction getters
+ * Reply and reaction getters from DB
  */
 const getReplies = () => {
     con.query(
@@ -112,7 +112,7 @@ client.once(Events.ClientReady, (readyClient) => {
 });
 
 /**
- * Reply and reaction getters
+ * Random reply / reaction getters
  * @returns reply_message / react_emoji
  */
 function getRandReply() {
