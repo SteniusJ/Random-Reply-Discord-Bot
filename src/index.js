@@ -280,12 +280,12 @@ client.on('interactionCreate', (interaction) => {
                         'id: ' +
                         element.id +
                         '\n Message: ' +
-                        element.reply_message +
+                        element.react_emoji +
                         '\n -------------------------- \n';
                 });
                 replAr.push(repl);
                 const channelId = interaction.channel;
-                interaction.reply('All replies currently in DB: \n');
+                interaction.reply('All reactions currently in DB: \n');
                 replAr.forEach(element => {
                     channelId.send(element);
                 });
