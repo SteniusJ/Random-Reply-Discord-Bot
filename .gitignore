@@ -3,3 +3,4 @@ config.json
 package-lock.json
 error_logs.txt
 .vscode
+launchBot.bat

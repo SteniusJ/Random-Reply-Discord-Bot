@@ -242,9 +242,7 @@ client.on('interactionCreate', (interaction) => {
                         element.reply_message +
                         '\n -------------------------- \n';
                 });
-                if (repl !== replAr[replAr.length - 1]) {
-                    replAr.push(repl);
-                }
+                replAr.push(repl);
                 const channelId = interaction.channel;
                 interaction.reply('All replies currently in DB: \n');
                 replAr.forEach(element => {
@@ -285,9 +283,7 @@ client.on('interactionCreate', (interaction) => {
                         element.reply_message +
                         '\n -------------------------- \n';
                 });
-                if (repl !== replAr[replAr.length - 1]) {
-                    replAr.push(repl);
-                }
+                replAr.push(repl);
                 const channelId = interaction.channel;
                 interaction.reply('All replies currently in DB: \n');
                 replAr.forEach(element => {
