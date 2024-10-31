@@ -39,14 +39,11 @@ const con = mysql.createPool({
     database: config.defaultdb,
 });
 
-const connectToDB = () => {
-    con.getConnection((err, connection) => {
-        if (err) throw err;
-        console.log('Connected!');
-        connection.release();
-    });
-};
-connectToDB();
+con.getConnection((err, connection) => {
+    if (err) throw err;
+    console.log('Connected!');
+    connection.release();
+});
 
 /**
  * Reply and reaction getters from DB
