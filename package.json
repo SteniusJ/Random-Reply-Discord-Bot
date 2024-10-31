@@ -1,7 +1,7 @@
 {
-    "name": "discord-bot-gregbot",
+    "name": "random-reply-discord-bot",
     "version": "0.0.1",
-    "description": "Brainrot discord bot",
+    "description": "random reply discord bot",
     "dependencies": {
         "discord.js": "^14.16.3",
         "express": "^4.21.1",
