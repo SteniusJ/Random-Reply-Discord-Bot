@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 });
 
 server.listen(port, () => {
-    console.log('GregBot live on *:' + port);
+    console.log('Bot live on *:' + port);
 });
 
 /**
