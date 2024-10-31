@@ -7,7 +7,6 @@ const config = require('../config.json');
 const mysql = require('mysql2');
 const fs = require('node:fs');
 const { stringify } = require('querystring');
-const { channel } = require('diagnostics_channel');
 
 var replies = [];
 var reactions = [];
