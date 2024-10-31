@@ -31,7 +31,7 @@ server.listen(port, () => {
 /**
  * DB setup
  */
-const con = mysql.createConnection({
+const con = mysql.createPool({
     host: config.dbhost,
     port: config.dbport,
     user: config.dbuser,
@@ -39,10 +39,14 @@ const con = mysql.createConnection({
     database: config.defaultdb,
 });
 
-con.connect(function (err) {
-    if (err) throw err;
-    console.log('Connected!');
-});
+const connectToDB = () => {
+    con.getConnection((err, connection) => {
+        if (err) throw err;
+        console.log('Connected!');
+        connection.release();
+    });
+};
+connectToDB();
 
 /**
  * Reply and reaction getters from DB
