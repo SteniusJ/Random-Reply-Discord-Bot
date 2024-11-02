@@ -47,8 +47,9 @@ con.getConnection((err, connection) => {
 
 /**
  * Reply and reaction getters from DB
+ * @argument channel is used for sending messages in channel to inform users of a error. Pass [interaction.channel] in case function is called in response to a interaction.
  */
-const getReplies = () => {
+const getReplies = (channel) => {
     con.query(
         `
         SELECT 
@@ -57,13 +58,19 @@ const getReplies = () => {
             replyMessages
     `,
         function (err, result, fields) {
-            if (err) throw err;
+            if (err) {
+                console.error(err);
+                writeErrorLog(err);
+                if (channel) {
+                    channel.send('ERROR: Failed to fetch replies from DB');
+                }
+            }
             replies = result;
         }
     );
 };
 
-const getReactions = () => {
+const getReactions = (channel) => {
     con.query(
         `
         SELECT 
@@ -72,7 +79,13 @@ const getReactions = () => {
             reactEmojis
     `,
         function (err, result, fields) {
-            if (err) throw err;
+            if (err) {
+                console.error(err);
+                writeErrorLog(err);
+                if (channel) {
+                    channel.send('ERROR: Failed to fetch reactions from DB');
+                }
+            }
             reactions = result;
         }
     );
@@ -168,18 +181,17 @@ client.on('interactionCreate', (interaction) => {
             query,
             [interaction.options.get('message-content').value],
             function (err, result) {
-                try {
-                    if (err) throw err;
+                if (err) {
+                    console.error(err);
+                    writeErrorLog(err);
+                    interaction.reply('ERROR: Failed to add reply');
+                } else {
                     interaction.reply(
                         'Reply [' +
                         interaction.options.get('message-content').value +
                         '] added'
                     );
-                    getReplies();
-                } catch (error) {
-                    console.error(error);
-                    interaction.reply('ERROR: Failed to add reply');
-                    writeErrorLog(error);
+                    getReplies(interaction.channel);
                 }
             }
         );
@@ -198,18 +210,17 @@ client.on('interactionCreate', (interaction) => {
             query,
             [interaction.options.get('react-emoji').value],
             function (err, result) {
-                try {
-                    if (err) throw err;
+                if (err) {
+                    console.error(err);
+                    writeErrorLog(err);
+                    interaction.reply('ERROR: Failed to add reaction');
+                } else {
                     interaction.reply(
                         'Reaction [' +
                         interaction.options.get('react-emoji').value +
                         '] added'
                     );
-                    getReactions();
-                } catch (error) {
-                    console.error(error);
-                    interaction.reply('ERROR: Failed to add reaction');
-                    writeErrorLog(error);
+                    getReactions(interaction.channel);
                 }
             }
         );
@@ -224,14 +235,16 @@ client.on('interactionCreate', (interaction) => {
                 replyMessages
         `;
         con.query(query, function (err, result) {
-            try {
-                if (err) throw err;
-
+            if (err) {
+                console.error(err);
+                interaction.reply('ERROR: Failed to get list of replies');
+                writeErrorLog(err);
+            } else {
                 //Generates reply string
                 var replAr = [];
                 var repl = '';
                 result.forEach((element) => {
-                    if (repl.length > 1800) {
+                    if (repl.length > 1400) {
                         replAr.push(repl);
                         repl = '';
                     }
@@ -248,10 +261,6 @@ client.on('interactionCreate', (interaction) => {
                 replAr.forEach(element => {
                     channelId.send(element);
                 });
-            } catch (error) {
-                console.error(error);
-                interaction.reply('ERROR: Failed to get list of replies');
-                writeErrorLog(error);
             }
         });
     }
@@ -265,14 +274,16 @@ client.on('interactionCreate', (interaction) => {
                 reactEmojis
         `;
         con.query(query, function (err, result) {
-            try {
-                if (err) throw err;
-
+            if (err) {
+                console.error(err);
+                interaction.reply('ERROR: Failed to get list of reactions');
+                writeErrorLog(err);
+            } else {
                 //Generates reply string
                 var replAr = [];
                 var repl = '';
                 result.forEach((element) => {
-                    if (repl.length > 1800) {
+                    if (repl.length > 1600) {
                         replAr.push(repl);
                         repl = '';
                     }
@@ -289,10 +300,6 @@ client.on('interactionCreate', (interaction) => {
                 replAr.forEach(element => {
                     channelId.send(element);
                 });
-            } catch (error) {
-                console.error(error);
-                interaction.reply('ERROR: Failed to get list of reactions');
-                writeErrorLog(error);
             }
         });
     }
@@ -309,19 +316,21 @@ client.on('interactionCreate', (interaction) => {
             query,
             [interaction.options.get('reply-id').value],
             function (err, result) {
-                try {
-                    if (err) throw err;
-                    if (result.affectedRows == 0) throw error;
+                if (result.affectedRows == 0) {
+                    interaction.reply(
+                        'ERROR: Given id matches no entry in db'
+                    );
+                } else if (err) {
+                    console.error(err);
+                    interaction.reply(
+                        'ERROR: Failed to remove reply from DB'
+                    );
+                    writeErrorLog(err);
+                } else {
                     interaction.reply(
                         'Reply: ' + interaction.options.get('reply-id').value + ' removed'
                     );
-                    getReplies();
-                } catch (error) {
-                    console.error(error);
-                    interaction.reply(
-                        'ERROR: Failed to remove reply from DB, check that id matches a entry'
-                    );
-                    writeErrorLog(error);
+                    getReplies(interaction.channel);
                 }
             }
         );
@@ -339,21 +348,23 @@ client.on('interactionCreate', (interaction) => {
             query,
             [interaction.options.get('reaction-id').value],
             function (err, result) {
-                try {
-                    if (err) throw err;
-                    if (result.affectedRows == 0) throw error;
+                if (result.affectedRows == 0) {
+                    interaction.reply(
+                        'ERROR: Given id matches no entry in db'
+                    );
+                } else if (err) {
+                    console.error(err);
+                    interaction.reply(
+                        'ERROR: Failed to remove reaction from DB'
+                    );
+                    writeErrorLog(err);
+                } else {
                     interaction.reply(
                         'Reacion: ' +
                         interaction.options.get('reaction-id').value +
                         ' removed'
                     );
-                    getReactions();
-                } catch (error) {
-                    console.error(error);
-                    interaction.reply(
-                        'ERROR: Failed to remove reaction from DB, check that id matches a entry'
-                    );
-                    writeErrorLog(error);
+                    getReactions(interaction.channel);
                 }
             }
         );
