@@ -65,6 +65,38 @@ const commands = [
             }
         ]
     },
+    {
+        name: "game",
+        description: "Sends random gif/image/message from db",
+    },
+    {
+        name: "addgame",
+        description: "Adds \"hop on\" message to DB",
+        options: [
+            {
+                name: "game-message",
+                description: "Game message contents that are added to DB, can be GIF/image links",
+                type: ApplicationCommandOptionType.String,
+                required: true
+            }
+        ]
+    },
+    {
+        name: "listgame",
+        description: "Lists all game messages currently in DB",
+    },
+    {
+        name: "removegame",
+        description: "Removes game message with specified id",
+        options: [
+            {
+                name: "game-id",
+                description: "id of game message",
+                type: ApplicationCommandOptionType.Integer,
+                required: true
+            }
+        ]
+    },
 ];
 
 const rest = new REST({ version: "10" }).setToken(config.token);

@@ -7,9 +7,11 @@ const config = require('../config.json');
 const mysql = require('mysql2');
 const fs = require('node:fs');
 const { stringify } = require('querystring');
+const { channel } = require('diagnostics_channel');
 
 var replies = [];
 var reactions = [];
+var gameMsg = [];
 
 //Chance is calculated like dice, so replyChance = 12, means that there is a 1 in 12 chance for the bot to reply.
 const replyChance = 12;
@@ -46,7 +48,7 @@ con.getConnection((err, connection) => {
 });
 
 /**
- * Reply and reaction getters from DB
+ * Reply, reaction and gameMessage getters from DB
  * @argument channel is used for sending messages in channel to inform users of a error. Pass [interaction.channel] in case function is called in response to a interaction.
  */
 const getReplies = (channel) => {
@@ -91,8 +93,30 @@ const getReactions = (channel) => {
     );
 };
 
+const getGame = (channel) => {
+    con.query(
+        `
+        SELECT 
+            *
+        FROM 
+            gameMessages
+    `,
+        function (err, result, fields) {
+            if (err) {
+                console.error(err);
+                writeErrorLog(err);
+                if (channel) {
+                    channel.send('ERROR: Failed to fetch gameMessages from DB');
+                }
+            }
+            gameMsg = result;
+        }
+    );
+};
+
 getReplies();
 getReactions();
+getGame();
 
 /**
  * Error log handling
@@ -125,17 +149,22 @@ client.once(Events.ClientReady, (readyClient) => {
 });
 
 /**
- * Random reply / reaction getters
- * @returns reply_message / react_emoji
+ * Random reply, reaction / game getters
+ * @returns reply_message, react_emoji / gameMessage
  */
-function getRandReply() {
+const getRandReply = () => {
     const i = Math.floor(Math.random() * replies.length);
     return replies[i].reply_message;
 }
 
-function getRandReaction() {
+const getRandReaction = () => {
     const i = Math.floor(Math.random() * reactions.length);
     return reactions[i].react_emoji;
+}
+
+const getRandGame = () => {
+    const i = Math.floor(Math.random() * gameMsg.length);
+    return gameMsg[i].game_message;
 }
 
 //Discord API rejection error handling
@@ -365,6 +394,111 @@ client.on('interactionCreate', (interaction) => {
                         ' removed'
                     );
                     getReactions(interaction.channel);
+                }
+            }
+        );
+    }
+
+    //For sending "hop on" messages in chat
+    if (interaction.commandName === 'game') {
+        interaction.reply(getRandGame());
+    }
+
+    //Adds game message to db
+    if (interaction.commandName === 'addgame') {
+        const query = `
+            INSERT INTO
+                gameMessages
+                (game_message)
+            VALUE
+                (?)
+        `;
+        con.query(
+            query,
+            [interaction.options.get('game-message').value],
+            function (err, result) {
+                if (err) {
+                    console.error(err);
+                    writeErrorLog(err);
+                    interaction.reply('ERROR: Failed to add game');
+                } else {
+                    interaction.reply(
+                        'Game [' +
+                        interaction.options.get('game-message').value +
+                        '] added'
+                    );
+                    getGame(interaction.channel);
+                }
+            }
+        );
+    }
+
+    //Lists all game messages in chat
+    if (interaction.commandName === "listgame") {
+        const query = `
+            SELECT 
+                *
+            FROM 
+                gameMessages
+        `;
+        con.query(query, function (err, result) {
+            if (err) {
+                console.error(err);
+                interaction.reply('ERROR: Failed to get list of game messages');
+                writeErrorLog(err);
+            } else {
+                //Generates reply string
+                var replAr = [];
+                var repl = '';
+                result.forEach((element) => {
+                    if (repl.length > 1400) {
+                        replAr.push(repl);
+                        repl = '';
+                    }
+                    repl +=
+                        'id: ' +
+                        element.id +
+                        '\n Message: ' +
+                        element.game_message +
+                        '\n -------------------------- \n';
+                });
+                replAr.push(repl);
+                const channelId = interaction.channel;
+                interaction.reply('All game messages currently in DB: \n');
+                replAr.forEach(element => {
+                    channelId.send(element);
+                });
+            }
+        });
+    }
+
+    //Removes game message at specified id
+    if (interaction.commandName === 'removegame') {
+        const query = `
+                DELETE FROM
+                    gameMessages
+                WHERE
+                    id = (?)
+            `;
+        con.query(
+            query,
+            [interaction.options.get('game-id').value],
+            function (err, result) {
+                if (result.affectedRows == 0) {
+                    interaction.reply(
+                        'ERROR: Given id matches no entry in db'
+                    );
+                } else if (err) {
+                    console.error(err);
+                    interaction.reply(
+                        'ERROR: Failed to remove game message from DB'
+                    );
+                    writeErrorLog(err);
+                } else {
+                    interaction.reply(
+                        'Reply: ' + interaction.options.get('game-id').value + ' removed'
+                    );
+                    getGame(interaction.channel);
                 }
             }
         );
