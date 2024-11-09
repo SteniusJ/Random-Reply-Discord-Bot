@@ -1,7 +1,5 @@
-const writeErrorLog = require("../functions/writeErrorLog");
-
 //Adds game message to db
-module.exports = (con, interaction) => {
+module.exports = async (con, interaction) => {
     const query = `
     INSERT INTO
         gameMessages
@@ -9,21 +7,11 @@ module.exports = (con, interaction) => {
     VALUE
         (?)
 `;
-    con.query(
-        query,
-        [interaction.options.get('game-message').value],
-        function (err) {
-            if (err) {
-                console.error(err);
-                writeErrorLog(err);
-                interaction.reply('ERROR: Failed to add game');
-                return;
-            }
-            interaction.reply(
-                'Game [' +
-                interaction.options.get('game-message').value +
-                '] added'
-            );
-        }
+    const [result] = await con.query(query, [interaction.options.get('game-message').value]);
+
+    interaction.reply(
+        'Game [' +
+        interaction.options.get('game-message').value +
+        '] added'
     );
 }

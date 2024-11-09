@@ -1,7 +1,5 @@
-const writeErrorLog = require("../functions/writeErrorLog");
-
 //adds reply to db
-module.exports = (con, interaction) => {
+module.exports = async (con, interaction) => {
     const query = `
     INSERT INTO
         replyMessages
@@ -9,21 +7,11 @@ module.exports = (con, interaction) => {
     VALUE
         (?)
 `;
-    con.query(
-        query,
-        [interaction.options.get('message-content').value],
-        function (err, result) {
-            if (err) {
-                console.error(err);
-                writeErrorLog(err);
-                interaction.reply('ERROR: Failed to add reply');
-                return;
-            }
-            interaction.reply(
-                'Reply [' +
-                interaction.options.get('message-content').value +
-                '] added'
-            );
-        }
+    const [result] = await con.query(query, [interaction.options.get('message-content').value]);
+
+    interaction.reply(
+        'Reply [' +
+        interaction.options.get('message-content').value +
+        '] added'
     );
 }
