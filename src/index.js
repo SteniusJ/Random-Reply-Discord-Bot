@@ -65,7 +65,6 @@ const slashCommandFiles = fs.readdirSync(config.slash_commands_file_loc, { withF
 
 for (const file of slashCommandFiles) {
     const filePath = path.join(config.slash_commands_file_loc, file.name);
-    //not proud of this one v
     let fileName = filePath.substr(lengthOfSlashCmdFilePath);
     fileName = fileName.substr(0, fileName.length - 3)
 
