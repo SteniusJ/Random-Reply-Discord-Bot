@@ -2,7 +2,6 @@ const writeErrorLog = require("./writeErrorLog");
 
 //gets one random reply from db
 module.exports = async (con) => {
-    let reply;
     const query = `
         SELECT
             reply_message
