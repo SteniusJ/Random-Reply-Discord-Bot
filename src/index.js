@@ -10,6 +10,8 @@ const path = require('path');
 const getRandReply = require("./functions/getRandReply");
 const getRandReaction = require("./functions/getRandReaction");
 const writeErrorLog = require("./functions/writeErrorLog");
+const setEndpoints = require("./functions/setEndpoints");
+const cors = require("cors");
 
 //Chance is calculated like dice, so replyChance = 12, means that there is a 1 in 12 chance for the bot to reply.
 const replyChance = 12;
@@ -17,17 +19,6 @@ const reactChance = 6;
 
 const port = 3000;
 const lengthOfSlashCmdFilePath = 52;
-
-/**
- * Server setup
- */
-app.get('/', (req, res) => {
-    res.send('<h1>Hello world</h1>');
-});
-
-server.listen(port, () => {
-    console.log('Bot live on *:' + port);
-});
 
 /**
  * DB setup
@@ -39,6 +30,18 @@ const con = mysql.createPool({
     password: config.dbpassword,
     database: config.defaultdb,
     waitForConnections: true
+});
+
+/**
+ * Server setup
+ */
+app.use(cors());
+app.use(express.json());
+
+setEndpoints(app, con, config);
+
+server.listen(port, () => {
+    console.log('Bot live on *:' + port);
 });
 
 /**
