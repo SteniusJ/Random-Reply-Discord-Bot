@@ -12,6 +12,10 @@ const getRandReaction = require("./functions/getRandReaction");
 const writeErrorLog = require("./functions/writeErrorLog");
 const setEndpoints = require("./functions/setEndpoints");
 const cors = require("cors");
+const getSteamLibrary = require('./functions/getSteamLibrary');
+const isMultiplayer = require('./functions/isMultiplayer');
+const findCommonGames = require('./functions/findCommonGames');
+const whattoplay = require('./slash_commands/whattoplay');
 
 //Chance is calculated like dice, so replyChance = 12, means that there is a 1 in 12 chance for the bot to reply.
 const replyChance = 12;
@@ -19,6 +23,8 @@ const reactChance = 6;
 
 const port = 3000;
 const lengthOfSlashCmdFilePath = 52;
+
+whattoplay(1, 1);
 
 /**
  * DB setup

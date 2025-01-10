@@ -97,6 +97,10 @@ const commands = [
             }
         ]
     },
+    {
+        name: "whattoplay",
+        description: "Randomly selects a multiplayer game that entered accounts have in common",
+    },
 ];
 
 const rest = new REST({ version: "10" }).setToken(config.token);
