@@ -24,8 +24,6 @@ const reactChance = 6;
 const port = 3000;
 const lengthOfSlashCmdFilePath = 52;
 
-whattoplay(1, 1);
-
 /**
  * DB setup
  */
