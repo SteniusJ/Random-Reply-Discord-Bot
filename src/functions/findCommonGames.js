@@ -1,4 +1,3 @@
-const { stringify } = require("querystring");
 const getSteamLibrary = require("./getSteamLibrary");
 const isMultiplayer = require("./isMultiplayer");
 const fs = require("fs");
