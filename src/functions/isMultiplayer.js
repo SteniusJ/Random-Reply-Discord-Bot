@@ -10,7 +10,6 @@ module.exports = async (gameID) => {
 
     for (i = 0; i < result[`${gameID}`].data.categories.length; i++) {
         keywords.forEach(keyword => {
-            console.log(result[`${gameID}`].data.categories[i].description);
             if (result[`${gameID}`].data.categories[i].description.localeCompare(keyword) === 0) {
                 flag = true;
                 return;
