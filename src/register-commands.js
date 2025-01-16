@@ -101,6 +101,18 @@ const commands = [
         name: "whattoplay",
         description: "Randomly selects a multiplayer game that entered accounts have in common",
     },
+    {
+        name: "refreshcommongames",
+        description: "Refreshes common game library with given steam user id's",
+        options: [
+            {
+                name: "steam-ids",
+                description: "Steam user ids in a comma seperated list with no spaces",
+                type: ApplicationCommandOptionType.String,
+                required: true
+            }
+        ]
+    }
 ];
 
 const rest = new REST({ version: "10" }).setToken(config.token);

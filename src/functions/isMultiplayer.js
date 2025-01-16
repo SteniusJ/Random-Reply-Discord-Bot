@@ -8,14 +8,15 @@ module.exports = async (gameID) => {
 
     const keywords = ["Multiplayer", "Multi-player", "Online pvp", "Online Co-op"];
 
-    for (i = 0; i <= result[`${gameID}`].data.categories.length; i++) {
+    for (i = 0; i < result[`${gameID}`].data.categories.length; i++) {
         keywords.forEach(keyword => {
+            console.log(result[`${gameID}`].data.categories[i].description);
             if (result[`${gameID}`].data.categories[i].description.localeCompare(keyword) === 0) {
                 flag = true;
-                return
+                return;
             }
         });
-        if (flag) return true
+        if (flag) return true;
     }
     return false;
 }
