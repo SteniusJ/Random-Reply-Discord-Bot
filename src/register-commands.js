@@ -112,6 +112,10 @@ const commands = [
                 required: true
             }
         ]
+    },
+    {
+        name: "gregflip",
+        description: "Coinflip, returns Gregs or Tails",
     }
 ];
 
