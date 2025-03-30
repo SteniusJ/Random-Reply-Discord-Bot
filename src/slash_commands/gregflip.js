@@ -1,5 +1,5 @@
 //Lists all game messages in chat
-module.exports = async (interaction) => {
+module.exports = async (con, interaction) => {
     if (Math.random() > 0.5) {
         interaction.reply('Gregs');
     } else {
