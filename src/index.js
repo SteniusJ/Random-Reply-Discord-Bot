@@ -88,6 +88,13 @@ process.on('unhandledRejection', (error) => {
  * React to client messages
  */
 client.on('messageCreate', async (message) => {
+    // always reply if mentioned
+    if (message.mentions.users.has(config.clientid)) {
+        const reply = await getRandReply(con);
+        message.reply(reply);
+        return;
+    }
+
     //reply to random messages with a random reply from DB
     if (Math.floor(Math.random() * replyChance) == 1 && !message.author.bot) {
         const reply = await getRandReply(con);
