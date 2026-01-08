@@ -2,6 +2,9 @@
     "name": "random-reply-discord-bot",
     "version": "0.0.1",
     "description": "random reply discord bot",
+    "scripts": {
+        "start": "node src/index.js"
+    },
     "dependencies": {
         "cors": "^2.8.5",
         "discord.js": "^14.16.3",
