@@ -12,13 +12,14 @@ const getRandReaction = require("./functions/getRandReaction");
 const writeErrorLog = require("./functions/writeErrorLog");
 const setEndpoints = require("./functions/setEndpoints");
 const cors = require("cors");
+const findCommonGames = require('./functions/findCommonGames');
 
 //Chance is calculated like dice, so replyChance = 12, means that there is a 1 in 12 chance for the bot to reply.
-const replyChance = 12;
-const reactChance = 6;
+const replyChance = config.replychance;
+const reactChance = config.reactchance;
 
 const port = 3000;
-const lengthOfSlashCmdFilePath = 52;
+const lengthOfSlashCmdFilePath = config.filepathlength;
 
 /**
  * DB setup
@@ -87,6 +88,13 @@ process.on('unhandledRejection', (error) => {
  * React to client messages
  */
 client.on('messageCreate', async (message) => {
+    // always reply if mentioned
+    if (message.mentions.users.has(config.clientid)) {
+        const reply = await getRandReply(con);
+        message.reply(reply);
+        return;
+    }
+
     //reply to random messages with a random reply from DB
     if (Math.floor(Math.random() * replyChance) == 1 && !message.author.bot) {
         const reply = await getRandReply(con);
