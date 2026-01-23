@@ -1,4 +1,4 @@
-//Lists all game messages in chat
+//Simulates coinflip
 module.exports = async (con, interaction) => {
     if (Math.random() > 0.5) {
         interaction.reply('Gregs');
