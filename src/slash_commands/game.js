@@ -1,4 +1,3 @@
-const getRandGame = require("../functions/getRandGame");
 const writeErrorLog = require("../functions/writeErrorLog");
 
 //For sending "hop on" messages in chat
