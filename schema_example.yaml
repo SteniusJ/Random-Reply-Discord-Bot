@@ -1,0 +1,18 @@
+tables:
+  replyMessages:
+    columns:
+      reply_message:
+        value: VarChar
+  reactEmojis:
+    columns:
+      react_emoji:
+        value: VarChar
+  gameMessages:
+    column:
+      value:
+        game_message: VarChar
+
+settings:
+  compartment:
+    rows: 25
+  password: OwnPersonalPasswordHere

@@ -4,3 +4,6 @@ package-lock.json
 error_logs.txt
 .vscode
 game_cache.json
+greg_schema.yaml
+CorrodeDB
+tables

@@ -4,7 +4,6 @@ const http = require('http');
 const server = http.createServer(app);
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const config = require('../config.json');
-const mysql = require('mysql2/promise');
 const fs = require('node:fs');
 const path = require('path');
 const getRandReply = require("./functions/getRandReply");
@@ -19,19 +18,8 @@ const replyChance = config.replychance;
 const reactChance = config.reactchance;
 
 const port = 3000;
+const dbHost = `${config.dbhost}?password=${config.dbpassword}`;
 const lengthOfSlashCmdFilePath = config.filepathlength;
-
-/**
- * DB setup
- */
-const con = mysql.createPool({
-    host: config.dbhost,
-    port: config.dbport,
-    user: config.dbuser,
-    password: config.dbpassword,
-    database: config.defaultdb,
-    waitForConnections: true
-});
 
 /**
  * Server setup
@@ -39,7 +27,7 @@ const con = mysql.createPool({
 app.use(cors());
 app.use(express.json());
 
-setEndpoints(app, con, config);
+setEndpoints(app, dbHost, config);
 
 server.listen(port, () => {
     console.log('Bot live on *:' + port);
@@ -70,7 +58,7 @@ const slashCommandFiles = fs.readdirSync(config.slash_commands_file_loc, { withF
 for (const file of slashCommandFiles) {
     const filePath = path.join(config.slash_commands_file_loc, file.name);
     let fileName = filePath.substr(lengthOfSlashCmdFilePath);
-    fileName = fileName.substr(0, fileName.length - 3)
+    fileName = fileName.substr(0, fileName.length - 3);
 
     slashCommands.push({
         filePath: filePath,
@@ -90,19 +78,19 @@ process.on('unhandledRejection', (error) => {
 client.on('messageCreate', async (message) => {
     // always reply if mentioned
     if (message.mentions.users.has(config.clientid)) {
-        const reply = await getRandReply(con);
+        const reply = await getRandReply(dbHost);
         message.reply(reply);
         return;
     }
 
     //reply to random messages with a random reply from DB
     if (Math.floor(Math.random() * replyChance) == 1 && !message.author.bot) {
-        const reply = await getRandReply(con);
+        const reply = await getRandReply(dbHost);
         message.reply(reply);
     }
     //react to random messages with a random reaction from DB
     if (Math.floor(Math.random() * reactChance) == 1 && !message.author.bot) {
-        const reply = await getRandReaction(con);
+        const reply = await getRandReaction(dbHost);
         message.react(reply);
     }
 });
@@ -116,7 +104,7 @@ client.on('interactionCreate', (interaction) => {
     for (const slashCommand of slashCommands) {
         if (slashCommand.fileName === interaction.commandName) {
             const slashFunction = require(slashCommand.filePath);
-            slashFunction(con, interaction);
+            slashFunction(dbHost, interaction);
         }
     }
 });

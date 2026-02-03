@@ -1,4 +1,4 @@
-module.exports = (app, con, config) => {
+module.exports = (app, dbHost, config) => {
     const APIKEY = config.APIKEY;
 
     app.get("/endpoints", (req, res) => {
@@ -14,15 +14,18 @@ module.exports = (app, con, config) => {
      */
     app.post("/listreplies", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-            SELECT
-                *
-            FROM
-                replyMessages
-        `;
+            const query = "replyMessages[*]";
 
-            const [result] = await con.query(query);
-            res.send(result);
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(res => {
+                if (!res.ok) {
+                    return `{"error": "database error"}`;
+                }
+                return res.json();
+            });
+            res.send(result.data);
         } else {
             res.send(`
                 {
@@ -34,15 +37,18 @@ module.exports = (app, con, config) => {
 
     app.post("/listreactions", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-            SELECT
-                *
-            FROM
-                reactEmojis
-        `;
+            const query = "reactEmojis[*]";
 
-            const [result] = await con.query(query);
-            res.send(result);
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(res => {
+                if (!res.ok) {
+                    return `{"error": "database error"}`;
+                }
+                return res.json();
+            });
+            res.send(result.data);
         } else {
             res.send(`
                 {
@@ -54,15 +60,18 @@ module.exports = (app, con, config) => {
 
     app.post("/listgames", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-            SELECT
-                *
-            FROM
-                gameMessages
-        `;
+            const query = "gameMessages[*]";
 
-            const [result] = await con.query(query);
-            res.send(result);
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(res => {
+                if (!res.ok) {
+                    return `{"error": "database error"}`;
+                }
+                return res.json();
+            });
+            res.send(result.data);
         } else {
             res.send(`
                 {
@@ -77,18 +86,21 @@ module.exports = (app, con, config) => {
      */
     app.put("/addreply", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-            INSERT INTO
-                replyMessages
-                (reply_message)
-            VALUE
-                (?)
-        `;
+            const body = req.body.message.replace(",", "\\,");
+            const query = `replyMessages[*] write ${body}`;
 
-            const [result] = await con.query(query, [req.body.message]);
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(res => {
+                if (!res.ok) {
+                    return `{"error": "database error"}`;
+                }
+                return res.json();
+            })
             res.send(`
                 {
-                    "reply": "Added reply, new id: ${result.insertId}"
+                    "reply": "Added reply: ${result.status}"
                 }
                 `);
         } else {
@@ -102,18 +114,21 @@ module.exports = (app, con, config) => {
 
     app.put("/addreaction", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-            INSERT INTO
-                reactEmojis
-                (react_emoji)
-            VALUE
-                (?)
-        `;
+            const body = req.body.message.replace(",", "\\,");
+            const query = `reactEmojis[*] write ${body}`;
 
-            const [result] = await con.query(query, [req.body.message]);
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(res => {
+                if (!res.ok) {
+                    return `{"error": "database error"}`;
+                }
+                return res.json();
+            })
             res.send(`
                 {
-                    "reply": "Added reaction, new id: ${result.insertId}"
+                    "reply": "Added reaction: ${result.status}"
                 }
                 `);
         } else {
@@ -127,18 +142,21 @@ module.exports = (app, con, config) => {
 
     app.put("/addgame", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-            INSERT INTO
-                gameMessages
-                (game_message)
-            VALUE
-                (?)
-        `;
+            const body = req.body.message.replace(",", "\\,");
+            const query = `gameMessages[*] write ${body}`;
 
-            const [result] = await con.query(query, [req.body.message]);
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(res => {
+                if (!res.ok) {
+                    return `{"error": "database error"}`;
+                }
+                return res.json();
+            })
             res.send(`
                 {
-                    "reply": "Added game, new id: ${result.insertId}"
+                    "reply": "Added game: ${result.status}"
                 }
                 `);
         } else {
@@ -155,24 +173,27 @@ module.exports = (app, con, config) => {
      */
     app.delete("/removereply", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-                DELETE FROM
-                    replyMessages
-                WHERE
-                    id = (?)
-            `;
+            const body = req.body.id;
+            const query = `replyMessages[${body}] remove`;
 
-            const [result] = await con.query(query, [req.body.id]);
-
-            if (result.affectedRows > 0) {
-                res.send(`
-                    {
-                        "reply": "Removed reply with id: ${req.body.id}"
-                    }
-                `);
-            } else {
-                res.send("Reply could not be removed");
-            }
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(response => {
+                if (!response.ok) {
+                    res.send(`
+                        {
+                            "error": "Reply could not be removed"
+                        }
+                    `);
+                }
+                return response.json();
+            })
+            res.send(`
+                {
+                    "reply": "Removed reply with id: ${req.body.id}"
+                }
+            `);
         } else {
             res.send(`
                     {
@@ -184,24 +205,27 @@ module.exports = (app, con, config) => {
 
     app.delete("/removereaction", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-                DELETE FROM
-                    reactEmojis
-                WHERE
-                    id = (?)
-            `;
+            const body = req.body.id;
+            const query = `reactEmojis[${body}] remove`;
 
-            const [result] = await con.query(query, [req.body.id]);
-
-            if (result.affectedRows > 0) {
-                res.send(`
-                    {
-                        "reply": "Removed reaction with id: ${req.body.id}"
-                    }
-                `);
-            } else {
-                res.send("Reaction could not be removed");
-            }
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(response => {
+                if (!response.ok) {
+                    res.send(`
+                        {
+                            "error": "Reaction could not be removed"
+                        }
+                    `);
+                }
+                return response.json();
+            })
+            res.send(`
+                {
+                    "reply": "Removed reaction with id: ${req.body.id}"
+                }
+            `);
         } else {
             res.send(`
                     {
@@ -213,24 +237,27 @@ module.exports = (app, con, config) => {
 
     app.delete("/removegame", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const query = `
-                DELETE FROM
-                    gameMessages
-                WHERE
-                    id = (?)
-            `;
+            const body = req.body.id;
+            const query = `gameMessages[${body}] remove`;
 
-            const [result] = await con.query(query, [req.body.id]);
-
-            if (result.affectedRows > 0) {
-                res.send(`
-                    {
-                        "reply": "Removed game with id: ${req.body.id}"
-                    }
-                `);
-            } else {
-                res.send("Game could not be removed");
-            }
+            const result = await fetch(dbHost, {
+                method: "POST",
+                body: query,
+            }).then(response => {
+                if (!response.ok) {
+                    res.send(`
+                        {
+                            "error": "Game could not be removed"
+                        }
+                    `);
+                }
+                return response.json();
+            })
+            res.send(`
+                {
+                    "reply": "Removed game with id: ${req.body.id}"
+                }
+            `);
         } else {
             res.send(`
                     {
