@@ -2,6 +2,10 @@
 
 This is a personal project for a discord bot that randomly replies/reacts to messages with reactions/replies stored in a database, which is easily editable within discord through slash-commands.
 
+## !Note
+
+this repository uses my own database CorrodeDB. A version which uses MySql can be found in the 'mysql' branch (that version is not guaranteed to be up to date).
+
 ## Project setup
 After cloning repository run:
 ```sh
