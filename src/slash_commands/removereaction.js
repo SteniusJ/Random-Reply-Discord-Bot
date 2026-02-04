@@ -1,22 +1,15 @@
 //Removes reaction at specified id
-module.exports = async (con, interaction) => {
-    const query = `
-    DELETE FROM
-        reactEmojis
-    WHERE
-        id = (?)
-`;
-    const [result] = await con.query(query, [interaction.options.get('reaction-id').value]);
+module.exports = async (dbHost, interaction) => {
+    const query = `reactEmojis[${interaction.options.get('reaction-id').value}] remove`;
 
-    if (result.affectedRows == 0) {
-        interaction.reply(
-            'ERROR: Given id matches no entry in db'
-        );
-    } else {
-        interaction.reply(
-            'Reacion: ' +
-            interaction.options.get('reaction-id').value +
-            ' removed'
-        );
-    }
+    const result = await fetch(dbHost, {
+        method: "POST",
+        body: query,
+    }).then(res => {
+        if (!res.ok) {
+            interaction.reply("failed to remove from db");
+            return;
+        }
+        interaction.reply(`Reaction: ${interaction.options.get('reaction-id').value} removed`);
+    });
 }

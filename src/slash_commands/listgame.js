@@ -1,12 +1,22 @@
 //Lists all game messages in chat
-module.exports = async (con, interaction) => {
-    const query = `
-    SELECT 
-        *
-    FROM 
-        gameMessages
-`;
-    const [result] = await con.query(query);
+module.exports = async (dbHost, interaction) => {
+    const query = `gameMessages[*]`;
+
+    const result = await fetch(dbHost, {
+        method: "POST",
+        body: query,
+    }).then(res => {
+        if (!res.ok) {
+            return null;
+        }
+        let response = res.json();
+        return response.data;
+    });
+
+    if (result === null) {
+        const channelId = interaction.channel;
+        channelId.send("failed to get game messages from db");
+    }
 
     //Generates reply string
     var replAr = [];

@@ -1,17 +1,20 @@
 //adds reply to db
-module.exports = async (con, interaction) => {
-    const query = `
-    INSERT INTO
-        replyMessages
-        (reply_message)
-    VALUE
-        (?)
-`;
-    const [result] = await con.query(query, [interaction.options.get('message-content').value]);
+module.exports = async (dbHost, interaction) => {
+    const body = interaction.options.get('message-content').value.replace(",", "\\,");
+    const query = `replyMessages[*] write ${body}`;
 
-    interaction.reply(
-        'Reply [' +
-        interaction.options.get('message-content').value +
-        '] added'
-    );
+    const result = await fetch(dbHost, {
+        method: "POST",
+        body: query,
+    }).then(res => {
+        if (!res.ok) {
+            interaction.reply("reply message add failed!");
+            return;
+        }
+        interaction.reply(
+            'Reply [' +
+            interaction.options.get('message-content').value +
+            '] added'
+        );
+    });
 }

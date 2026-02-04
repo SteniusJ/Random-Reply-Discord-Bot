@@ -1,19 +1,15 @@
 //Removes reply at specified id
-module.exports = async (con, interaction) => {
-    const query = `
-    DELETE FROM
-        replyMessages
-    WHERE
-        id = (?)
-`;
-    const [result] = await con.query(query, [interaction.options.get('reply-id').value]);
-    if (result.affectedRows == 0) {
-        interaction.reply(
-            'ERROR: Given id matches no entry in db'
-        );
-    } else {
-        interaction.reply(
-            'Reply: ' + interaction.options.get('reply-id').value + ' removed'
-        );
-    }
+module.exports = async (dbHost, interaction) => {
+    const query = `replyMessages[${interaction.options.get('reply-id').value}] remove`;
+
+    const result = await fetch(dbHost, {
+        method: "POST",
+        body: query,
+    }).then(res => {
+        if (!res.ok) {
+            interaction.reply("failed to remove from db");
+            return;
+        }
+        interaction.reply(`Reply: ${interaction.options.get('reply-id').value} removed`);
+    });
 }

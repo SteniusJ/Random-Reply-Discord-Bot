@@ -1,17 +1,20 @@
 //Adds game message to db
-module.exports = async (con, interaction) => {
-    const query = `
-    INSERT INTO
-        gameMessages
-        (game_message)
-    VALUE
-        (?)
-`;
-    const [result] = await con.query(query, [interaction.options.get('game-message').value]);
+module.exports = async (dbHost, interaction) => {
+    const body = interaction.options.get('game-message').value.replace(",", "\\,");
+    const query = `gameMessages[*] write ${body}`;
 
-    interaction.reply(
-        'Game [' +
-        interaction.options.get('game-message').value +
-        '] added'
-    );
+    const result = await fetch(dbHost, {
+        method: "POST",
+        body: query,
+    }).then(res => {
+        if (!res.ok) {
+            interaction.reply("game message add failed!");
+            return;
+        }
+        interaction.reply(
+            'Game [' +
+            interaction.options.get('game-message').value +
+            '] added'
+        );
+    });
 }

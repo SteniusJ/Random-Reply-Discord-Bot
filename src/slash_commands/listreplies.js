@@ -1,12 +1,22 @@
 //Lists all added replies
-module.exports = async (con, interaction) => {
-    const query = `
-    SELECT 
-        *
-    FROM 
-        replyMessages
-`;
-    const [result] = await con.query(query);
+module.exports = async (dbHost, interaction) => {
+    const query = `replyMessages[*]`;
+
+    const result = await fetch(dbHost, {
+        method: "POST",
+        body: query,
+    }).then(res => {
+        if (!res.ok) {
+            return null;
+        }
+        let response = res.json();
+        return response.data;
+    });
+
+    if (result === null) {
+        const channelId = interaction.channel;
+        channelId.send("failed to get replies from db");
+    }
 
     //Generates reply string
     var replAr = [];
