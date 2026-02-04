@@ -9,8 +9,7 @@ module.exports = async (dbHost, interaction) => {
         if (!res.ok) {
             return null;
         }
-        let response = res.json();
-        return response.data;
+        return res.json();
     });
 
     if (result === null) {
@@ -21,7 +20,7 @@ module.exports = async (dbHost, interaction) => {
     //Generates reply string
     var replAr = [];
     var repl = '';
-    result.forEach((element) => {
+    result.data.forEach((element) => {
         if (repl.length > 1600) {
             replAr.push(repl);
             repl = '';
