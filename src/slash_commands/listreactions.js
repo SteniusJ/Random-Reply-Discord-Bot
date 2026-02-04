@@ -27,7 +27,7 @@ module.exports = async (dbHost, interaction) => {
         }
         repl +=
             'id: ' +
-            element.id +
+            element.index +
             '\n Message: ' +
             element.react_emoji +
             '\n -------------------------- \n';
