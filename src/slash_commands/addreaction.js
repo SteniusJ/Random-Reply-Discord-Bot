@@ -1,6 +1,8 @@
+const dbEntrySanitize = require("../functions/dbEntrySanitize");
+
 //adds reaction to db
 module.exports = async (dbHost, interaction) => {
-    const body = interaction.options.get('react-emoji').value.replace(",", "\\,");
+    const body = dbEntrySanitize(interaction.options.get('react-emoji').value);
     const query = `reactEmojis[*] write ${body}`;
 
     const result = await fetch(dbHost, {

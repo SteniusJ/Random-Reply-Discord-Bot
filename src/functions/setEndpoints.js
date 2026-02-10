@@ -1,3 +1,5 @@
+const dbEntrySanitize = require("./dbEntrySanitize");
+
 module.exports = (app, dbHost, config) => {
     const APIKEY = config.APIKEY;
 
@@ -86,7 +88,7 @@ module.exports = (app, dbHost, config) => {
      */
     app.put("/addreply", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const body = req.body.message.replace(",", "\\,");
+            const body = dbEntrySanitize(req.body.message);
             const query = `replyMessages[*] write ${body}`;
 
             const result = await fetch(dbHost, {
@@ -114,7 +116,7 @@ module.exports = (app, dbHost, config) => {
 
     app.put("/addreaction", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const body = req.body.message.replace(",", "\\,");
+            const body = dbEntrySanitize(req.body.message);
             const query = `reactEmojis[*] write ${body}`;
 
             const result = await fetch(dbHost, {
@@ -142,7 +144,7 @@ module.exports = (app, dbHost, config) => {
 
     app.put("/addgame", async (req, res) => {
         if (req.body.APIKEY == APIKEY) {
-            const body = req.body.message.replace(",", "\\,");
+            const body = dbEntrySanitize(req.body.message);
             const query = `gameMessages[*] write ${body}`;
 
             const result = await fetch(dbHost, {
