@@ -2,7 +2,7 @@ const writeErrorLog = require("../functions/writeErrorLog");
 
 //For sending "hop on" messages in chat
 module.exports = async (dbHost, interaction) => {
-    const query = "gameMessages[*] random 1";
+    const query = "gameMessages[*] | random 1";
     const result = await fetch(dbHost, {
         method: "POST",
         body: query,

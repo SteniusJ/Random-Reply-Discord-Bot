@@ -2,7 +2,7 @@ const writeErrorLog = require("./writeErrorLog");
 
 //gets one random reply from db
 module.exports = async (dbHost) => {
-    const query = "replyMessages[*] random 1";
+    const query = "replyMessages[*] | random 1";
     const result = await fetch(dbHost, {
         method: "POST",
         body: query,

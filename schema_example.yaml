@@ -8,9 +8,9 @@ tables:
       react_emoji:
         value: VarChar
   gameMessages:
-    column:
-      value:
-        game_message: VarChar
+    columns:
+      game_message:
+        value: VarChar
 
 settings:
   compartment:
